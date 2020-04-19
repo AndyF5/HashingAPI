@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HashingAPI.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,7 @@ namespace HashingAPI.Controllers
         private Hasher hasher = new Hasher();
 
         // GET: api/Hash/string
+        [EnableCors]
         [HttpGet("{stringToHash}")]
         public Hash Get(string stringToHash)
         {
@@ -22,6 +24,7 @@ namespace HashingAPI.Controllers
         }
 
         // POST: api/Hash
+        [EnableCors]
         [HttpPost]
         public IActionResult Post([FromBody] HashRequest hashRequest)
         {

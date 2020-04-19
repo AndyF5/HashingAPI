@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/3c6ae6b97c.js" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://www.afaulkner.net/css/main.css">
+
+    <title>API Interface | Andrew Faulkner</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a href="https://www.afaulkner.net"><img class="logo mr-3" src="https://www.afaulkner.net/content/logo-192x192.png" /></a><a class="navbar-brand" href="https://www.afaulkner.net">Andrew Faulkner</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+                <a class="navbar-brand" href="https://github.com/AndyF5"><h1 class="fab fa-github-square m-0"></h2></a>
+                <a class="navbar-brand" href="www.linkedin.com/in/andrew-faulkner5"><h1 class="fab fa-linkedin m-0"></h1></a>
+            </div>
+        </div>
+    </nav>
+    <div class="container pt-4">
+        <div class="jumbotron">
+            <h3>This is a small javascript application that uses the hashing API via Ajax to hash a string.</h3>
+            <p>Enter a string below and, optionally, the number of iterations you want the hasher to perform. The default number of iterations is 1000, the more iterations the hasher performs the more secure the hash is against brute force attacks.</p>
+            <p>To come: an interface to check a hash against a hash/iteration/salt combination</p>
+        </div>
+        <div class="form-group">
+            <label for="stringToHash">String to hash</label>
+            <input type="text" class="form-control" id="stringToHash" />
+            <div class="alert alert-danger mt-2" style="display: none;" id="stringToHashAlert">Enter a string!</div>
+        </div>
+
+        <div class="form-group">
+            <label for="iterations">Iterations (optional)</label>
+            <input type="number" class="form-control" id="iterations" min="0" max="1000000" />
+        </div>
+
+        <div class="form-group">
+            <button id="btnHash" type="button" class="btn btn-outline-success">Hash</button>
+        </div>
+
+        <div class="alert alert-danger mt-2" style="display: none;" id="ajaxAlert"><b>Request error!</b></div>
+
+        <div class="jumbotron py-3" id="results" style="display: none;">
+            <dl class="ml-2">
+                <dt class="row">
+                    Hash
+                </dt>
+                <dd class="row">
+                    <input id="hashResult" class="text-monospace col-md-6 form-control"><div class="col-md-4"><button class="btn btn-outline-success" onclick="copy(hashResult)"><i class="far fa-copy"></i></button></div>
+                </dd>
+                <dt class="row">
+                    Number of iterations
+                </dt>
+                <dd class="row">
+                    <input id="iterationsResult" class="text-monospace col-md-6 form-control"><div class="col-md-4"><button class="btn btn-outline-success" onclick="copy(iterationsResult)"><i class="far fa-copy"></i></button></div>
+                </dd>
+                <dt class="row">
+                    Salt
+                </dt>
+                <dd class="row">
+                    <input id="saltResult" class="text-monospace col-md-6 form-control"><div class="col-md-4"><button class="btn btn-outline-success" onclick="copy(saltResult)"><i class="far fa-copy"></i></button></div>
+                </dd>
+            </dl>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#results").hide();
+
+            $("#btnHash").click(function () {
+                var stringToHashData = $("#stringToHash").val();
+                var iterationsData = $("#iterations").val();
+
+                var postData = {
+                    stringToHash: "string",
+                    iterations: 500
+                }
+
+                if (stringToHashData) {
+                    var request = $.ajax({
+                        url: '/api/Hash/',
+                        type: 'post',
+                        data: JSON.stringify(postData),
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        timeout: 1000,
+                        success: function (result) {
+                            $("#results").show();
+                            $("#hashResult").val(result.hashedString);
+                            $("#iterationsResult").val(result.iterations);
+                            $("#saltResult").val(result.salt);
+                        },
+                        error: function (message) {
+                            $("#ajaxAlert").append("<br/>" + message.statusText);
+                            $("#ajaxAlert").show();
+                            console.log(message.statusText);
+                        }
+                    });
+                }
+                else {
+                    $("#stringToHashAlert").show();
+                }
+            });
+
+
+        });
+
+        function copy(id) {
+            id.select();
+
+            document.execCommand("copy");
+        }
+    </script>
+</body>
+</html>
