@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/3c6ae6b97c.js" crossorigin="anonymous"></script>
@@ -25,8 +26,8 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
-                <a class="navbar-brand" href="https://github.com/AndyF5"><h1 class="fab fa-github-square m-0"></h2></a>
-                <a class="navbar-brand" href="www.linkedin.com/in/andrew-faulkner5"><h1 class="fab fa-linkedin m-0"></h1></a>
+                <a class="navbar-brand" href="https://github.com/AndyF5"><h1 class="fab fa-github-square m-0"></h1></a>
+                <a class="navbar-brand" href="https://www.linkedin.com/in/andrew-faulkner5/fr"><h1 class="fab fa-linkedin m-0"></h1></a>
             </div>
         </div>
     </nav>
@@ -34,60 +35,121 @@
         <div class="jumbotron">
             <h3>This is a small javascript application that uses the hashing API via Ajax to hash a string.</h3>
             <p>Enter a string below and, optionally, the number of iterations you want the hasher to perform. The default number of iterations is 1000, the more iterations the hasher performs the more secure the hash is against brute force attacks.</p>
-            <p>To come: an interface to check a hash against a hash/iteration/salt combination</p>
+            <p>You can also check the hash/iteration/salt combination against a string using the validator.</p>
         </div>
-        <div class="form-group">
-            <label for="stringToHash">String to hash</label>
-            <input type="text" class="form-control" id="stringToHash" />
-            <div class="alert alert-danger mt-2" style="display: none;" id="stringToHashAlert">Enter a string!</div>
-        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+                    <a class="nav-link active" id="v-pills-hashGenerator" data-toggle="pill" href="#hashGenerator" role="tab" aria-controls="hashGenerator" aria-selected="true">Generator</a>
+                    <a class="nav-link" id="v-pills-hashValidator" data-toggle="pill" href="#hashValidator" role="tab" aria-controls="hashValidator" aria-selected="false">Validator</a>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="tab-content" id="tabContent">
+                    <div id="hashGenerator" class="tab-pane fade show active" role="tabpanel" aria-labelledby="v-pills-hashGenerator">
+                        <h2>Generator</h2>
+                        <div class="form-group">
+                            <label for="stringToHash">String to hash</label>
+                            <input type="text" class="form-control" id="stringToHash" />
+                            <div class="alert alert-danger mt-2" style="display: none;" id="stringToHashAlert">Enter a string!</div>
+                        </div>
 
-        <div class="form-group">
-            <label for="iterations">Iterations (optional)</label>
-            <input type="number" class="form-control" id="iterations" min="0" max="1000000" />
-        </div>
+                        <div class="form-group">
+                            <label for="iterations">Iterations (optional)</label>
+                            <input type="number" class="form-control" id="iterations" min="0" max="1000000" />
+                        </div>
 
-        <div class="form-group">
-            <button id="btnHash" type="button" class="btn btn-outline-success">Hash</button>
-        </div>
+                        <div class="form-group">
+                            <button id="btnHash" type="button" class="btn btn-outline-success">Hash</button>
+                        </div>
 
-        <div class="alert alert-danger mt-2" style="display: none;" id="ajaxAlert"><b>Request error!</b></div>
+                        <div class="alert alert-danger mt-2" style="display: none;" id="ajaxAlert"><b>Request error!</b></div>
 
-        <div class="jumbotron py-3" id="results" style="display: none;">
-            <dl class="ml-2">
-                <dt class="row">
-                    Hash
-                </dt>
-                <dd class="row">
-                    <input id="hashResult" class="text-monospace col-md-6 form-control"><div class="col-md-4"><button class="btn btn-outline-success" onclick="copy(hashResult)"><i class="far fa-copy"></i></button></div>
-                </dd>
-                <dt class="row">
-                    Number of iterations
-                </dt>
-                <dd class="row">
-                    <input id="iterationsResult" class="text-monospace col-md-6 form-control"><div class="col-md-4"><button class="btn btn-outline-success" onclick="copy(iterationsResult)"><i class="far fa-copy"></i></button></div>
-                </dd>
-                <dt class="row">
-                    Salt
-                </dt>
-                <dd class="row">
-                    <input id="saltResult" class="text-monospace col-md-6 form-control"><div class="col-md-4"><button class="btn btn-outline-success" onclick="copy(saltResult)"><i class="far fa-copy"></i></button></div>
-                </dd>
-            </dl>
+                        <div class="jumbotron py-3" id="results" style="display: none;">
+                            <dl class="ml-2">
+                                <dt class="row">
+                                    Hash
+                                </dt>
+                                <dd class="row">
+                                    <input id="hashResult" class="text-monospace col-md-6 form-control"><div class="col-md-4"><button class="btn btn-outline-success" onclick="copy(hashResult)"><i class="far fa-copy"></i></button></div>
+                                </dd>
+                                <dt class="row">
+                                    Number of iterations
+                                </dt>
+                                <dd class="row">
+                                    <input id="iterationsResult" class="text-monospace col-md-6 form-control"><div class="col-md-4"><button class="btn btn-outline-success" onclick="copy(iterationsResult)"><i class="far fa-copy"></i></button></div>
+                                </dd>
+                                <dt class="row">
+                                    Salt
+                                </dt>
+                                <dd class="row">
+                                    <input id="saltResult" class="text-monospace col-md-6 form-control"><div class="col-md-4"><button class="btn btn-outline-success" onclick="copy(saltResult)"><i class="far fa-copy"></i></button></div>
+                                </dd>
+                                <dd class="row">
+                                    <button type="button" class="btn btn-outline-success mt-2" id="btn_copyall" onclick="copyAll()">Copy all to validator <i class="far fa-copy"></i></button>
+                                </dd>
+                            </dl>
+
+                                
+
+                            
+                        </div>
+                    </div>
+                    <div id="hashValidator" class="tab-pane fade" role="tabpanel" aria-labelledby="v-pills-hashValidator">
+                        <h2>Validator</h2>
+                        <form name="validation" id="validation">
+                            <div class="form-group">
+                                <label for="stringToHash">Hashed string</label>
+                                <input type="text" class="form-control" id="v_hashedString" name="hashedString" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="iterations">Iterations (optional)</label>
+                                <input type="number" class="form-control" id="v_iterations" name="iterations" min="0" max="1000000" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="stringToHash">Salt</label>
+                                <input type="text" class="form-control" id="v_salt" name="salt" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="stringToHash">String to validate</label>
+                                <input type="text" class="form-control" id="v_stringToValidate" name="stringToValidate" required />
+                            </div>
+
+                            <div class="form-group">
+                                <button id="btnValidate" type="submit" class="btn btn-outline-success">Validate</button>
+                            </div>
+
+
+                        </form>
+                        <div class="alert alert-danger mt-2" style="display: none;" id="ajaxValidationAlert"><b>Request error!</b></div>
+                        <div class="alert alert-danger mt-2" style="display: none;" id="notMatchResult"><b>Hashes don't match!</b></div>
+                        <div class="alert alert-success mt-2" style="display: none;" id="matchResult"><b>Hashes match!</b></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
     <script>
         $(document).ready(function () {
             $("#results").hide();
 
+
             $("#btnHash").click(function () {
+                $("#stringToHashAlert").hide();
+
                 var stringToHashData = $("#stringToHash").val();
                 var iterationsData = $("#iterations").val();
 
                 var postData = {
-                    stringToHash: "string",
-                    iterations: 500
+                    stringToHash: stringToHashData,
+                    iterations: parseInt(iterationsData)
                 }
+
+                console.log(JSON.stringify(postData));
 
                 if (stringToHashData) {
                     var request = $.ajax({
@@ -96,7 +158,6 @@
                         data: JSON.stringify(postData),
                         contentType: 'application/json',
                         dataType: 'json',
-                        timeout: 1000,
                         success: function (result) {
                             $("#results").show();
                             $("#hashResult").val(result.hashedString);
@@ -115,13 +176,87 @@
                 }
             });
 
+            $("#validation").validate({
+                rules: {
+                    hashedString: {
+                        required: true,
+                        minlength: 32,
+                        maxlength: 32
+                    },
+                    iterations: "required",
+                    salt: {
+                        required: true,
+                        minlength: 32,
+                        maxlength: 32
+                    },
+                    stringToValidate: "required"
+                },
+                messages: {
+                    hashedString: {
+                        required: "Enter the hashed string",
+                        minlength: "Hash should be 32 characters",
+                        maxlength: "Hash should be 32 characters"
+                    },
+                    iterations: "Enter the number of iterations.",
+                    salt: {
+                        required: "Enter the salt",
+                        minlength: "Salt should be 32 characters",
+                        maxlength: "Salt should be 32 characters"
+                    },
+                    stringToValidate: "Enter the string you wish to validate."
+                },
+                submitHandler: function () {
+                    $("#notMatchResult").hide();
+                    $("#matchResult").hide();
 
+                    var postData = JSON.stringify(
+                        {
+                            salt: $("#v_salt").val(),
+                            iterations: parseInt($("#v_iterations").val()),
+                            hashedString: $("#v_hashedString").val(),
+                            stringToValidate: $("#v_stringToValidate").val()
+                        }
+                    );
+
+                    console.log(postData);
+
+                    $.ajax({
+                        url: '/api/Validation',
+                        type: 'post',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: postData,
+                        success: function (result) {
+                            if (result) {
+                                $("#matchResult").show();
+                            }
+                            else {
+                                $("#notMatchResult").show();
+                            }
+                        },
+                        error: function (message) {
+                            $("#ajaxValidationAlert").append("<br/>" + message.statusText);
+                            $("#ajaxValidationAlert").show();
+                            console.log(message.statusText);
+                        }
+                    })
+
+                    return false;
+                }
+            });
         });
 
         function copy(id) {
             id.select();
 
             document.execCommand("copy");
+        }
+
+        function copyAll() {
+            console.log("copyAll");
+            document.querySelector("#v_hashedString").value = document.querySelector("#hashResult").value;
+            document.querySelector("#v_iterations").value = document.querySelector("#iterationsResult").value;
+            document.querySelector("#v_salt").value = document.querySelector("#saltResult").value;
         }
     </script>
 </body>

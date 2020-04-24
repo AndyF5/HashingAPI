@@ -30,5 +30,7 @@ namespace HashingAPI.Controllers
         {
             return Ok(hasher.GenerateHash(hashRequest));
         }
+
+        
     }
 }

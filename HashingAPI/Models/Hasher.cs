@@ -51,7 +51,9 @@ namespace HashingAPI.Models
         {
             byte[] salt = Convert.FromBase64String(hash.Salt);
 
-            return Generate(testString, salt, hash.Iterations) == hash.HashedString;
+            string hashedTestPassword = Generate(testString, salt, hash.Iterations);
+
+            return hashedTestPassword == hash.HashedString;
         }
     }
 }
